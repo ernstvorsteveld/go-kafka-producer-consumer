@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: bitnami/zookeeper:3.7.0
+    restart: always
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    environment:
+      - ZOO_SERVER_ID=1
+      - ALLOW_ANONYMOUS_LOGIN=yes
+      - ZOO_SERVERS=zookeeper:2888:3888
+  kafka:
+    image: bitnami/kafka:3.1.0
+    restart: always
+    ports:
+      - 19092:19092
+    environment:
+      - KAFKA_CFG_BROKER_ID=1
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INSIDE://:9092,OUTSIDE://127.0.0.1:19092
+      - KAFKA_CFG_LISTENERS=INSIDE://:9092,OUTSIDE://:19092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INSIDE
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+    depends_on:
+      - zookeeper
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.29.0
+    restart: always
+    ports:
+      - 9000:9000
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_BROKERCONNECT=kafka:9092
+    depends_on:
+      - zookeeper
+      - kafka
