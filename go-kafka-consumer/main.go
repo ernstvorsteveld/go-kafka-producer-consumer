@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
 func main() {
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:19092",
+		"bootstrap.servers": "localhost:9192,localhost:9292,localhost:9392",
 		"group.id":          "test1",
 		"auto.offset.reset": "earliest",
 	})
